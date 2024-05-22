@@ -1,0 +1,18 @@
+{
+  "name": "wtb-discord-bot",
+  "module": "src/main.ts",
+  "main": "dist/main.js",
+  "type": "module",
+  "author": "Johan",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "discord.js": "^14.15.2",
+    "dotenv": "^16.4.5"
+  }
+}
