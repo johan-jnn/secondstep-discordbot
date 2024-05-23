@@ -1,18 +1,19 @@
-import { Client, REST, Routes } from "discord.js";
-import { readdirSync } from "node:fs";
+import { ButtonStyle, Client, REST, Routes } from "discord.js";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import BotCommand, { BotCommandElement } from "./utils/command";
-import type BotEvent from "./utils/event";
-import type { BotEventElement } from "./utils/event";
+import BotCommand, { BotCommandElement } from "./utils/command.js";
+import BotEvent from "./utils/event.js";
+import type { BotEventElement } from "./utils/event.js";
 import { pathToFileURL } from "node:url";
 import "dotenv/config";
-import type BotModal from "./utils/modal";
-import type { BotModalElement } from "./utils/modal";
+import BotModal from "./utils/modal.js";
+import type { BotModalElement } from "./utils/modal.js";
+import yaml from "yaml";
+import Settings from "../settings.js";
+import BotButton, { BotButtonElement } from "./utils/button.js";
 
 function listDir(dir: string) {
 	const files = readdirSync(dir);
-	console.log(files);
-
 	return files.map((name) => pathToFileURL(path.join(dir, name)).toString());
 }
 
@@ -20,10 +21,17 @@ export default class WTBClient extends Client {
 	commands?: BotCommand[];
 	events?: BotEvent[];
 	modals?: BotModal[];
+	buttons?: BotButton[];
+	settings: Settings = yaml.parse(
+		readFileSync(
+			pathToFileURL(path.join(import.meta.dirname, "../settings.yaml")),
+			{ encoding: "utf-8" }
+		)
+	);
 	private isLogin = false;
 	constructor() {
 		super({
-			intents: ["Guilds", "GuildMembers", "MessageContent"],
+			intents: ["Guilds", "GuildMembers"],
 		});
 	}
 
@@ -35,11 +43,38 @@ export default class WTBClient extends Client {
 		);
 	}
 
-	getModal(id: string) {
-		const found = this.modals?.find(
-			(modal) => modal.informations.custom_id === id
-		);
-		return found;
+	private getComponentIdentifier(
+		component: BotCommand | BotEvent | BotModal | BotButton
+	): string {
+		if (component instanceof BotCommand) return component.informations.name;
+		else if (component instanceof BotEvent) return component.name;
+		else if (component instanceof BotModal)
+			return component.informations.custom_id;
+		else if (component instanceof BotButton)
+			return component.informations.style === ButtonStyle.Link
+				? component.informations.url
+				: component.informations.custom_id;
+		return "";
+	}
+
+	getComponent<
+		Collection extends "commands" | "events" | "modals" | "buttons",
+		R = Collection extends "commands"
+			? BotCommand
+			: Collection extends "events"
+			? BotEvent
+			: Collection extends "modals"
+			? BotModal
+			: Collection extends "buttons"
+			? BotButton
+			: never
+	>(collection: Collection, handle: string): R | null {
+		const collectionContent = this[collection];
+		return (
+			collectionContent?.find(
+				(component) => this.getComponentIdentifier(component) === handle
+			) || null
+		) as R;
 	}
 
 	async login(token?: string) {
@@ -57,7 +92,10 @@ export default class WTBClient extends Client {
 			this.events = mod.map(({ default: Event }) => new Event(this));
 		});
 		await this.load<typeof BotModalElement>("./modals").then((mod) => {
-			this.modals = mod.map(({ default: Event }) => new Event(this));
+			this.modals = mod.map(({ default: Modal }) => new Modal(this));
+		});
+		await this.load<typeof BotButtonElement>("./buttons").then((mod) => {
+			this.buttons = mod.map(({ default: Button }) => new Button(this));
 		});
 
 		this.events?.forEach((event) => {
@@ -74,7 +112,10 @@ export default class WTBClient extends Client {
 			console.log(`Refreshing ${this.commands?.length} commmands...`);
 			try {
 				await rest.put(
-					Routes.applicationCommands(this.application.id),
+					Routes.applicationGuildCommands(
+						this.application.id,
+						this.settings.guild.id
+					),
 					{
 						body: this.commands.map((c) => c.informations),
 					}
@@ -92,4 +133,6 @@ export default class WTBClient extends Client {
 }
 
 const client = new WTBClient();
+console.log(client.settings);
+
 client.login();

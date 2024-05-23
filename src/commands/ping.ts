@@ -3,7 +3,7 @@ import {
 	SlashCommandBuilder,
 	type CacheType,
 } from "discord.js";
-import type WTBClient from "../main";
+import type WTBClient from "../main.js";
 import BotCommand from "../utils/command.js";
 
 export default class Ping extends BotCommand {

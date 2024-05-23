@@ -1,5 +1,5 @@
 import type { Interaction } from "discord.js";
-import type WTBClient from "../main";
+import type WTBClient from "../main.js";
 import BotEvent from "../utils/event.js";
 
 export default class InteractionCreate extends BotEvent {
@@ -12,13 +12,23 @@ export default class InteractionCreate extends BotEvent {
 		...parameters: any[]
 	): Promise<any> {
 		if (interaction.isChatInputCommand()) {
-			const command = this.client.commands?.find(
-				(cmd) => cmd.informations.name === interaction.commandName
+			const command = this.client.getComponent(
+				"commands",
+				interaction.commandName
 			);
 			if (command) return command.onSent(interaction);
 		} else if (interaction.isModalSubmit()) {
-			const modal = this.client.getModal(interaction.customId);
+			const modal = this.client.getComponent(
+				"modals",
+				interaction.customId
+			);
 			if (modal) return modal.onSubmited(interaction);
+		} else if (interaction.isButton()) {
+			const button = this.client.getComponent(
+				"buttons",
+				interaction.customId
+			);
+			if (button) return button.onClick(interaction);
 		}
 	}
 }

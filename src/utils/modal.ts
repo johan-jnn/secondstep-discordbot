@@ -8,7 +8,7 @@ import {
 	type APIModalInteractionResponseCallbackData,
 	type Interaction,
 } from "discord.js";
-import type WTBClient from "../main";
+import type WTBClient from "../main.js";
 import path from "node:path";
 
 export default class BotModal {

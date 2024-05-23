@@ -3,7 +3,7 @@ import type {
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 	SlashCommandBuilder,
 } from "discord.js";
-import type WTBClient from "../main";
+import type WTBClient from "../main.js";
 import path from "node:path";
 
 export default class BotCommand {

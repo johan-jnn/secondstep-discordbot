@@ -7,8 +7,10 @@ import {
 	TextInputStyle,
 	type CacheType,
 } from "discord.js";
-import type WTBClient from "../main";
+import type WTBClient from "../main.js";
 import BotCommand from "../utils/command.js";
+import { isModerator } from "../utils/permissions.js";
+import { getMember } from "../utils/getters.js";
 
 export default class WTB extends BotCommand {
 	constructor(client: WTBClient) {
@@ -22,12 +24,22 @@ export default class WTB extends BotCommand {
 	async onSent(
 		interaction: ChatInputCommandInteraction<CacheType>
 	): Promise<any> {
+		const member = await getMember(interaction);
+		if (!member) return;
+
+		if (!isModerator(member, this.client.settings))
+			return interaction.reply({
+				content: "Tu n'es pas autorisé à exécuter cette commande.",
+				ephemeral: true,
+			});
+
 		this.client
-			.getModal("wtb-create")
+			.getComponent("modals", "wtb-create")
 			?.show(interaction)
 			.catch((err) => {
 				interaction.reply({
-					content: "An error has come...",
+					content:
+						"Désolé, je n'ai pas réussi à t'afficher le formulaire...",
 					ephemeral: true,
 				});
 				console.error(err);

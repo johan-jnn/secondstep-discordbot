@@ -1,4 +1,4 @@
-import type WTBClient from "../main";
+import type WTBClient from "../main.js";
 import BotEvent from "../utils/event.js";
 
 export default class Ready extends BotEvent {
