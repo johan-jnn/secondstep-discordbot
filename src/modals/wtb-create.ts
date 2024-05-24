@@ -16,6 +16,7 @@ import {
 import type WTBClient from "../main.js";
 import BotModal from "../utils/modal.js";
 import { StockXProduct } from "../utils/stockx.js";
+import { getErrorMessage } from "../utils/getters.js";
 
 export default class WTBCreate extends BotModal {
 	private webhooks: WebhookClient[];
@@ -50,7 +51,9 @@ export default class WTBCreate extends BotModal {
 			],
 		});
 
-		this.webhooks= client.settings.wtb_webhooks.map((url) => new WebhookClient({ url }));
+		this.webhooks = client.settings.wtb_webhooks.map(
+			(url) => new WebhookClient({ url })
+		);
 	}
 
 	async onSubmited(
@@ -64,7 +67,12 @@ export default class WTBCreate extends BotModal {
 		const fields = {
 			SKU: sku,
 			"Etat recherché": getField("etat"),
-			Payout: getField("payout"),
+			Payout: parseFloat(
+				getField("payout").replaceAll(/\s*/g, "").replace(",", ".")
+			).toLocaleString("fr-FR", {
+				currency: "EUR",
+				style: "currency",
+			}),
 			Tailles: getField("sizes")
 				.split(/\s*,\s*/)
 				.map((size) => `* ${size}`)
@@ -111,8 +119,9 @@ export default class WTBCreate extends BotModal {
 
 		if (!channel?.isTextBased())
 			return interaction.user.send({
-				content:
-					"Oups... Je n'ai pas trouvé le channel où envoyer les offres. Contactez l'administrateur/développeur du robot.",
+				content: getErrorMessage(
+					"Je n'ai pas trouvé le salon où envoyer les offres."
+				),
 			});
 
 		const meetup = this.client.getComponent("buttons", "meetup");
@@ -121,8 +130,9 @@ export default class WTBCreate extends BotModal {
 
 		if (!(meetup && shipping && close))
 			return interaction.user.send({
-				content:
-					"Oups... Je n'ai pas réussi à construire correctement le message. Contactez l'administrateur/développeur du robot.",
+				content: getErrorMessage(
+					"Je n'ai pas réussi à construire correctement le message."
+				),
 			});
 		const message = await channel.send({
 			content: "",
@@ -135,11 +145,11 @@ export default class WTBCreate extends BotModal {
 				),
 			],
 		});
-		this.webhooks.forEach(hook => {
+		this.webhooks.forEach((hook) => {
 			hook.send({
 				content: hyperlink("Nouveau WTB :", message.url),
-				embeds: [embed]
-			})
-		})
+				embeds: [embed],
+			});
+		});
 	}
 }

@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import WTBClient from "../main.js";
 import BotButton from "../utils/button.js";
+import { getErrorMessage } from "../utils/getters.js";
 
 export default class Shipping extends BotButton {
 	constructor(client: WTBClient) {
@@ -26,11 +27,12 @@ export default class Shipping extends BotButton {
 		const meetup = this.client.getComponent("buttons", "meetup");
 		if (!meetup)
 			return interaction.reply({
-				content:
-					"Oups... Je n'ai pas trouvé la fonction pour ce bouton. Contactez l'administrateur/développeur du robot.",
+				content: getErrorMessage(
+					"Je n'ai pas trouvé la fonction pour ce bouton."
+				),
 				ephemeral: true,
 			});
-		const {onClick} = meetup;
+		const { onClick } = meetup;
 		return onClick.bind(this)(interaction);
 	}
 }

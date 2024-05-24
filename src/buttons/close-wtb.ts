@@ -1,4 +1,5 @@
 import {
+	bold,
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
@@ -9,10 +10,11 @@ import {
 	ThreadAutoArchiveDuration,
 	time,
 	TimestampStyles,
+	underline,
 } from "discord.js";
 import WTBClient from "../main.js";
 import BotButton from "../utils/button.js";
-import { getMember } from "../utils/getters.js";
+import { getErrorMessage, getMember } from "../utils/getters.js";
 import { isModerator } from "../utils/permissions.js";
 
 export default class CloseWTB extends BotButton {
@@ -38,7 +40,9 @@ export default class CloseWTB extends BotButton {
 
 		if (!interaction.message.deletable)
 			return interaction.reply({
-				content: "Je ne peux pas supprimer ce message...",
+				content: getErrorMessage(
+					"Je ne peux pas supprimer ce message."
+				),
 				ephemeral: true,
 			});
 		const { thread } = interaction.message;
@@ -57,9 +61,10 @@ export default class CloseWTB extends BotButton {
 						})
 						.then((col) => col.values())
 				).reduceRight(
-					(data, { author, content, createdAt }) => {
+					(data, { author, content, createdAt, system }) => {
 						const lastContent = data.at(-1);
-						if (!lastContent) {
+						if (system) return data;
+						else if (!lastContent) {
 							// The first message is the bot creating message, so we can skip it
 							data.push({
 								author,
@@ -119,7 +124,9 @@ export default class CloseWTB extends BotButton {
 		return interaction.reply({
 			content: deleted
 				? "Recherche supprimée !"
-				: "Impossible de supprimer la recherche... Essayez de supprimez le message de vous même.",
+				: getErrorMessage(
+						"Impossible de supprimer la recherche... (Essayez de supprimer le message de vous même)"
+				  ),
 			ephemeral: true,
 		});
 	}

@@ -1,4 +1,4 @@
-import { GuildMember, Interaction } from "discord.js";
+import { codeBlock, GuildMember, Interaction, italic, underline } from "discord.js";
 
 export async function getMember(
 	interaction: Interaction
@@ -8,4 +8,12 @@ export async function getMember(
 	return interaction.guild?.members.fetch({
 		user: interaction.user,
 	}) || null;
+}
+
+export function getErrorMessage(error: string) {
+	return [
+		underline("😭 Une erreur est survenu..."),
+		codeBlock(error),
+		italic("Contactez l'administrateur/développeur du robot !")
+	].join("\n")
 }

@@ -10,7 +10,7 @@ import {
 import type WTBClient from "../main.js";
 import BotCommand from "../utils/command.js";
 import { isModerator } from "../utils/permissions.js";
-import { getMember } from "../utils/getters.js";
+import { getErrorMessage, getMember } from "../utils/getters.js";
 
 export default class WTB extends BotCommand {
 	constructor(client: WTBClient) {
@@ -38,8 +38,9 @@ export default class WTB extends BotCommand {
 			?.show(interaction)
 			.catch((err) => {
 				interaction.reply({
-					content:
-						"Désolé, je n'ai pas réussi à t'afficher le formulaire...",
+					content: getErrorMessage(
+						"Je n'ai pas réussi à t'afficher le formulaire..."
+					),
 					ephemeral: true,
 				});
 				console.error(err);
