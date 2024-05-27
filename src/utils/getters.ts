@@ -12,8 +12,8 @@ export async function getMember(
 
 export function getErrorMessage(error: string) {
 	return [
-		underline("😭 Une erreur est survenu..."),
+		underline("😭 Une erreur est survenu :"),
 		codeBlock(error),
-		italic("Contactez l'administrateur/développeur du robot !")
+		italic("Contactez l'administrateur/développeur du robot ou vérifiez les arguments entrés !")
 	].join("\n")
 }

@@ -1,53 +1,17 @@
-import "dotenv/config";
-import path from "node:path";
+import { StockxClient, StockxProduct } from "stockx-scraper";
 
-function getTokens() {
-	const key = process.env.STOCKX_API_KEY;
-	const jtw = process.env.STOCKX_API_JTW;
-	if (!(key && jtw))
-		throw new Error(
-			"Cannot access to the StockX API. No credentials set in the environement."
-		);
-	return { key, jtw };
-}
-function getHeader() {
-	const { jtw, key } = getTokens();
-	return {
-		"x-api-key": key,
-		Authorization: `Bearer ${jtw}`,
-	};
-}
+const client = new StockxClient({
+	countryCode: "FR",
+	currencyCode: "EUR",
+});
 
-export const API_VERSION = 2;
-export const API_ROOT = `https://api.stockx.com/v${API_VERSION}/`;
-export const endPoints = {
-	product: (id: string) => path.join(API_ROOT, "/catalog/products/", id),
-};
-export async function getProduct(sku: string) {
-	return fetch(endPoints.product(sku), {
-		headers: getHeader(),
-	})
-		.then(async (res) => ({
-			data: (await res.json()) as StockXProduct,
-		}))
-		.catch((err) => ({
-			err,
-		}));
-}
-
-export interface StockXProduct {
-	productId: string;
-	urlKey: string;
-	styleId: string | null;
-	productType: string;
-	title: string | null;
-	brand: string | null;
-	productAttributes: {
-		gender: string | null;
-		season: string | null;
-		releaseDate: string | null;
-		retailPrice: number | null;
-		colorway: string | null;
-		color: string | null;
-	};
+export async function getProduct(sku: string): Promise<StockxProduct | null> {
+	return (
+		(await client
+			.search({
+				query: sku,
+			})
+			.then((arr) => arr[0])
+			.catch(() => null)) || null
+	);
 }

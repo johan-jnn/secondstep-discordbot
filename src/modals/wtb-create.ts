@@ -15,9 +15,11 @@ import {
 } from "discord.js";
 import type WTBClient from "../main.js";
 import BotModal from "../utils/modal.js";
-import { StockXProduct } from "../utils/stockx.js";
 import { getErrorMessage } from "../utils/getters.js";
+import { getProduct } from "../utils/stockx.js";
+import { getAverageColor } from "fast-average-color-node";
 
+const defaultMaxNote = 10;
 export default class WTBCreate extends BotModal {
 	private webhooks: WebhookClient[];
 	constructor(client: WTBClient) {
@@ -31,10 +33,10 @@ export default class WTBCreate extends BotModal {
 					.setStyle(TextInputStyle.Short),
 				new TextInputBuilder()
 					.setCustomId("etat")
-					.setLabel("Etat de la paire")
+					.setLabel(`Etat de la paire (ramené sur ${defaultMaxNote})`)
 					.setStyle(TextInputStyle.Short)
 					.setPlaceholder(
-						"Note à donner (ex. '8 / 10', '17 / 20', ...)"
+						`Note à donner (ex. '8 / 10', '17 / 20', ...). Sur ${defaultMaxNote} par défaut.`
 					),
 				new TextInputBuilder()
 					.setCustomId("payout")
@@ -48,12 +50,47 @@ export default class WTBCreate extends BotModal {
 						"Si plusieurs tailles souhaités, séparer les différentes tailles par des virgules."
 					)
 					.setStyle(TextInputStyle.Short),
+				new TextInputBuilder()
+					.setCustomId("description")
+					.setRequired(false)
+					.setStyle(TextInputStyle.Paragraph)
+					.setLabel("Informations supplémentaires")
+					.setPlaceholder(
+						"Ecrivez ici les éventuelles informations supplémentaires sur la paire recherchée."
+					),
 			],
 		});
 
 		this.webhooks = client.settings.wtb_webhooks.map(
 			(url) => new WebhookClient({ url })
 		);
+	}
+
+	private parseSizes(input: string) {
+		return input
+			.split(/\s*,\s*/)
+			.map((size) => `* ${size}`)
+			.join("\n");
+	}
+	private parsePayout(input: string) {
+		const number = parseFloat(
+			input.replaceAll(/\s*/g, "").replace(",", ".")
+		);
+		if (isNaN(number)) return null;
+		return number.toLocaleString("fr-FR", {
+			currency: "EUR",
+			style: "currency",
+		});
+	}
+	private parseEtat(input: string) {
+		const [note_str, max_str] = input.split(/\s*\/\s*/);
+		const [note, max] = [
+			parseFloat(note_str || "0"),
+			parseFloat(max_str || defaultMaxNote.toString()),
+		];
+		if (isNaN(note) || isNaN(max) || note > max) return null;
+
+		return `${(note * defaultMaxNote / max).toFixed(1)} / ${defaultMaxNote}`;
 	}
 
 	async onSubmited(
@@ -64,54 +101,52 @@ export default class WTBCreate extends BotModal {
 		const getField = (id: string) =>
 			interaction.fields.getTextInputValue(id);
 		const sku = getField("sku");
+		const customDescription = getField("description");
 		const fields = {
 			SKU: sku,
-			"Etat recherché": getField("etat"),
-			Payout: parseFloat(
-				getField("payout").replaceAll(/\s*/g, "").replace(",", ".")
-			).toLocaleString("fr-FR", {
-				currency: "EUR",
-				style: "currency",
-			}),
-			Tailles: getField("sizes")
-				.split(/\s*,\s*/)
-				.map((size) => `* ${size}`)
-				.join("\n"),
+			"Etat recherché": this.parseEtat(getField("etat")),
+			Payout: this.parsePayout(getField("payout")),
+			Tailles: this.parseSizes(getField("sizes")),
 		};
 
-		const data: StockXProduct = {
-			brand: "<BRAND>",
-			productId: sku,
-			title: "<TITLE>",
-			urlKey: "https://johan-janin.com",
-			productType: "Shoes",
-			styleId: null,
-			productAttributes: {
-				color: null,
-				colorway: null,
-				gender: null,
-				releaseDate: "08-25-2014",
-				retailPrice: 250,
-				season: "<SEASON>",
-			},
-		};
+		for (const [key, value] of Object.entries(fields)) {
+			if (value === null)
+				return interaction.reply(
+					getErrorMessage(`Entrée invalide pour le champ "${key}".`)
+				);
+		}
 
+		const data = await getProduct(sku);
+		if (!data)
+			return interaction.user.send(
+				getErrorMessage(
+					"Le produit associé à ce SKU n'a pas été trouvé. Le problème peut également venir de StockX qui bloque la recherche."
+				)
+			);
+
+		const extractedColor = await getAverageColor(data.image, {
+			ignoredColor: [255, 255, 255],
+		});
 		const embed = new EmbedBuilder()
 			.setAuthor({
-				name: data.title || "<titre introuvable>",
-				url: data.urlKey,
+				name: data?.name || "<titre introuvable>",
+				url: data.url,
 			})
 			.setColor(
-				(data.productAttributes.color || "Random") as ColorResolvable
+				(parseInt(extractedColor.hex.slice(1), 16) ||
+					"Random") as ColorResolvable
 			)
 			.setFields(
 				Object.entries(fields).map(([key, value]) => ({
 					name: bold(underline(key) + " :"),
-					value: codeBlock(value),
+					value: codeBlock(value as string),
 					inline: true,
 				}))
 			)
+			.setImage(data.image)
 			.setTimestamp();
+
+		if (customDescription) embed.setDescription(customDescription);
 
 		const channel = this.client.channels.cache.get(
 			this.client.settings.guild.channels.buyers

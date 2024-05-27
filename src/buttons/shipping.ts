@@ -16,7 +16,7 @@ export default class Shipping extends BotButton {
 			client,
 			new ButtonBuilder()
 				.setLabel("Shipping")
-				.setStyle(ButtonStyle.Secondary)
+				.setStyle(ButtonStyle.Primary)
 				.setEmoji("📦")
 				.setLabel("Shipping")
 		);
