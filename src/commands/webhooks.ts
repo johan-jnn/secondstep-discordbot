@@ -88,9 +88,15 @@ export default class Ping extends BotCommand {
 						),
 					});
 				const new_size = updateWebhooks((list) => {
+					if(list.includes(url)) return "Le webhook existe déjà !"
 					list.push(url);
 					return list.length;
 				});
+				if(typeof new_size === "string") return interaction.reply({
+					ephemeral: true,
+					content: getErrorMessage(new_size)
+				})
+				
 				return interaction.reply({
 					content: `Le webhook vient d'être ajouté. Le robot possède désormais ${new_size} webhooks.`,
 				});

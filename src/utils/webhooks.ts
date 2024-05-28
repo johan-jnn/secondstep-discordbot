@@ -1,6 +1,6 @@
 import { readFileSync, existsSync, writeFile } from "node:fs";
-import { join, parse } from "node:path";
-const webhooksFile = join(parse(process.argv[1]).dir, "../webhooks.json");
+import { join } from "node:path";
+const webhooksFile = join(import.meta.dirname, "../../webhooks.json");
 
 var cache: string[] | null = null;
 

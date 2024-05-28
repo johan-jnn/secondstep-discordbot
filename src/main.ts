@@ -24,7 +24,9 @@ export default class WTBClient extends Client {
 	buttons?: BotButton[];
 	settings: Settings = yaml.parse(
 		readFileSync(
-			pathToFileURL(path.join(import.meta.dirname, "../settings.yaml")),
+			pathToFileURL(
+				path.join(import.meta.dirname, "../settings.yaml")
+			),
 			{ encoding: "utf-8" }
 		)
 	);
@@ -70,11 +72,9 @@ export default class WTBClient extends Client {
 			: never
 	>(collection: Collection, handle: string): R | null {
 		const collectionContent = this[collection];
-		return (
-			collectionContent?.find(
-				(component) => this.getComponentIdentifier(component) === handle
-			) || null
-		) as R;
+		return (collectionContent?.find(
+			(component) => this.getComponentIdentifier(component) === handle
+		) || null) as R;
 	}
 
 	async login(token?: string) {
