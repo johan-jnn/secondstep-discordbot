@@ -8,7 +8,3 @@ guild:
   channels:
     buyers: "1243156652199252048"
     closed_commands: "1243156682008166510"
-
-wtb_webhooks:
-- "https://discord.com/api/webhooks/1243182874459639860/18iZ6xEymTDua6Oh_IiquEz_AAi2FCYe239H4RUdPWOHH0P4bgJ2LPbZ7nSfrk141BWM"
-    

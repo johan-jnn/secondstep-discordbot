@@ -18,10 +18,10 @@ import BotModal from "../utils/modal.js";
 import { getErrorMessage } from "../utils/getters.js";
 import { getProduct } from "../utils/stockx.js";
 import { getAverageColor } from "fast-average-color-node";
+import { getWebhooks } from "../utils/webhooks.js";
 
 const defaultMaxNote = 10;
 export default class WTBCreate extends BotModal {
-	private webhooks: WebhookClient[];
 	constructor(client: WTBClient) {
 		super(import.meta.filename, client, {
 			title: "Créer un nouveau WTB",
@@ -60,10 +60,6 @@ export default class WTBCreate extends BotModal {
 					),
 			],
 		});
-
-		this.webhooks = client.settings.wtb_webhooks.map(
-			(url) => new WebhookClient({ url })
-		);
 	}
 
 	private parseSizes(input: string) {
@@ -180,8 +176,8 @@ export default class WTBCreate extends BotModal {
 				),
 			],
 		});
-		this.webhooks.forEach((hook) => {
-			hook.send({
+		getWebhooks().forEach((url) => {
+			new WebhookClient({ url }).send({
 				content: hyperlink("Nouveau WTB :", message.url),
 				embeds: [embed],
 			});

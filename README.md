@@ -10,11 +10,14 @@ Dans cette courte note va vous être présenté le robot à travers ses commande
   - [Table des matières](#table-des-matières)
   - [Commandes](#commandes)
     - [/wtb](#wtb)
+    - [/webhooks](#webhooks)
+      - [/webhooks add](#webhooks-add)
+      - [/webhooks delete](#webhooks-delete)
+      - [/webhooks list](#webhooks-list)
   - [Paramétrage du robot](#paramétrage-du-robot)
     - [Identifiants](#identifiants)
     - [Moderators](#moderators)
     - [Guild](#guild)
-    - [WTB\_Webhooks](#wtb_webhooks)
   - [Auteur](#auteur)
 
 ## Commandes
@@ -24,6 +27,22 @@ Afin de sécuriser la création des commandes, celles-ci sont uniquement utilisa
 ### /wtb
 
 Permet de créer un nouveau WantToBuy. A la suite de l'envoi la commande, un formulaire vous sera présenté. Une fois le formulaire validé, la commande sera crée dans [le salon prévu à cet effet](#guild).
+
+### /webhooks
+
+Permet de gérer les webhooks. Cette commande possède des sous-commandes afin de mieux catégoriser les actions :
+
+#### /webhooks add
+
+Permet d'ajouter un webhook. Un argument `webhook-url` vous sera demandé. A savoir que l'URL du webhook sera vérifiée.
+
+#### /webhooks delete
+
+Permet de supprimer un webhook. Un argument `id` vous sera demandé. Cette argument correspond au chiffre après le `#` lorsque vous [liser les webhooks disponibles](#webhooks-list).
+
+#### /webhooks list
+
+Permet de lister tous les webhooks actifs.
 
 ## Paramétrage du robot
 
@@ -61,6 +80,7 @@ Cette clef permet de paramétrer les utilisateurs/rôles qui sont définis comme
 
 - Créer des WTB (via la commande [`/wtb`](#wtb))
 - Supprimer (fermer) les tickets
+- Gérer (créer, supprimer, lister) les webhooks
 
 Voici la syntax à adopter :
 
@@ -82,16 +102,6 @@ guild:
     channels:
         buyers: "" # Identifiant du salon où apparaitront tous les tickets ouverts
         closed_commands: "" # Identifiant du salon où seront retranscrit toutes les commandes qui ont été fermés (avec les messages et informations de la paire)
-```
-
-### WTB_Webhooks
-
-Une liste d'url de webhooks. Une fois la commande créée, le bot enverra un message avec toutes les informations de la commande sur ce webhook.
-
-Voici la syntax à adopter :
-
-```yaml
-wtb_webhooks: [] # Liste d'URL de webhooks
 ```
 
 ## Auteur
