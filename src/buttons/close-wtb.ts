@@ -164,7 +164,7 @@ export default class CloseWTB extends BotButton {
 						parent: category,
 					})
 					.then(async (channel) => {
-						channel.send({
+						await channel.send({
 							content:
 								"Retranscription des messages lié au WTB suivant :",
 							embeds: [interaction.message.embeds[0]],
