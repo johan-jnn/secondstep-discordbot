@@ -7,9 +7,10 @@ export default interface Settings {
 	guild: {
 		id: string;
 		channels: {
-			buyers: string;
-			closed_commands: string;
+			wtb: string;
+		};
+		categories: {
+			closed_tickets: string;
 		};
 	};
-	wtb_webhooks: string[];
 }

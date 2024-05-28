@@ -100,8 +100,9 @@ Voici la syntax à adopter :
 guild:
     id: "" # Identifiant du serveur SecondStep
     channels:
-        buyers: "" # Identifiant du salon où apparaitront tous les tickets ouverts
-        closed_commands: "" # Identifiant du salon où seront retranscrit toutes les commandes qui ont été fermés (avec les messages et informations de la paire)
+        wtb: "" # Identifiant du salon où apparaitront tous les tickets ouverts
+    categories:
+        closed_tickets: "" # Identifiant de la catégorie où seront retranscrit toutes les commandes qui ont été fermés (avec les threads, messages et informations de la paire)
 ```
 
 ## Auteur

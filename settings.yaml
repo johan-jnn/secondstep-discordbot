@@ -2,9 +2,10 @@ moderators:
   users:
     - "514475217779818496"
   roles: []
-    
+
 guild:
   id: "825437050320584744"
   channels:
-    buyers: "1243156652199252048"
-    closed_commands: "1243156682008166510"
+    wtb: "1243156652199252048"
+  categories:
+    closed_tickets: "1244994345053061130"

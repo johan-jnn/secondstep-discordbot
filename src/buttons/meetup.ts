@@ -4,6 +4,7 @@ import {
 	ButtonInteraction,
 	ButtonStyle,
 	ChannelType,
+	EmbedBuilder,
 	hyperlink,
 	inlineCode,
 	quote,
@@ -12,7 +13,7 @@ import {
 } from "discord.js";
 import WTBClient from "../main.js";
 import BotButton from "../utils/button.js";
-import { getErrorMessage } from "../utils/getters.js";
+import { getErrorMessage, getMember } from "../utils/getters.js";
 
 export default class Meetup extends BotButton {
 	constructor(client: WTBClient) {
@@ -29,90 +30,67 @@ export default class Meetup extends BotButton {
 
 	async onClick(interaction: ButtonInteraction): Promise<any> {
 		if (!interaction.guild) return;
-		if (
-			!(
-				interaction.channel?.type === ChannelType.GuildText ||
-				interaction.channel?.type === ChannelType.GuildAnnouncement
-			)
-		)
-			return;
+		if (interaction.channel?.type !== ChannelType.GuildText) return;
+		const member = await getMember(interaction);
+		if (!member) return;
+
 		const { label } = this.informations;
 		if (!label)
 			return interaction.reply({
-				content:
-					"Oups... Une erreur est survenu (le bouton n'a pas de label). Contactez l'administrateur/développeur du robot.",
+				content: getErrorMessage("Le bouton ne possède pas de label."),
 				ephemeral: true,
 			});
 
-		const { thread } = interaction.message;
 		const ticketTitle =
 			interaction.message.embeds[0].author?.name || "<generated>";
-		if (thread) {
-			const threadLabels = /\[\s*(.+?)(?:\s*&\s*(.*?))?\s*\]/.exec(
-				thread.name
-			);
-			if (!threadLabels)
-				return interaction.reply({
-					content: getErrorMessage(
-						"Les labels du thread n'ont pas été trouvé."
-					),
-					ephemeral: true,
-				});
 
-			if (threadLabels[0].includes(label))
-				return interaction.reply({
-					content: `Le ticket a déjà été ouvert. ${hyperlink(
-						"Clickez ici pour y accéder",
-						thread.url
-					)}.`,
-					ephemeral: true,
-				});
-			else {
-				await thread.setName(`[${threadLabels[1]} & ${label}]`);
-
-				await thread.send({
-					content: [
-						bold(
-							underline(
-								`${
-									this.informations.emoji?.name ||
-									"information_source"
-								} Le ticket vient de changer d'état !`
-							)
-						),
-						quote(
-							`Il est désormais valable en ${inlineCode(
-								threadLabels[1]
-							)} et en ${inlineCode(label)}.`
-						),
-					].join("\n"),
-				});
-
-				return interaction.reply({
-					content: `Le thread vient d'être modifié. ${hyperlink(
-						"Cliquez pour y accéder",
-						thread.url
-					)}`,
-					ephemeral: true,
-				});
-			}
-		}
 		const name = `[${label}]> ` + ticketTitle;
 		return interaction.channel.threads
 			.create({
 				name,
-				startMessage: interaction.message,
 				autoArchiveDuration: ThreadAutoArchiveDuration.OneDay,
 				reason: `${interaction.user.username} can sell ${name}.`,
+				type: ChannelType.PrivateThread,
 			})
-			.then((thread) =>
-				interaction.reply({
+			.then(async (thread) => {
+				await thread.setInvitable(false);
+
+				await thread.members.add(member);
+				for (const userID of this.client.settings.moderators.users)
+					thread.members.add(userID);
+				for (const roleID of this.client.settings.moderators.roles) {
+					const members =
+						interaction.guild?.roles.cache.get(roleID)?.members;
+					if (!members) continue;
+					members.forEach((id) => thread.members.add(id));
+				}
+
+				const elementEmbed = new EmbedBuilder(
+					interaction.message.embeds[0].toJSON()
+				).setFooter({
+					text: `Ticket ouvert par ${interaction.user.tag}`,
+					iconURL: interaction.user.avatarURL() || undefined
+				});
+
+				await thread
+					.send({
+						content: `Ticket en ${label} ouvert par ${
+							interaction.user.tag
+						} !\n${hyperlink(
+							"Voir le WTB",
+							interaction.message.url
+						)}`,
+						embeds: [elementEmbed],
+					})
+					.then((m) => m.pin());
+
+				return interaction.reply({
 					content: `Le ticket vient d'être ouvert ! ${hyperlink(
-						"Clickez pour commencer la conversation",
+						"Clickez pour voir la conversation",
 						thread.url
 					)}`,
 					ephemeral: true,
-				})
-			);
+				});
+			});
 	}
 }

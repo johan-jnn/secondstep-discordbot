@@ -145,7 +145,7 @@ export default class WTBCreate extends BotModal {
 		if (customDescription) embed.setDescription(customDescription);
 
 		const channel = this.client.channels.cache.get(
-			this.client.settings.guild.channels.buyers
+			this.client.settings.guild.channels.wtb
 		);
 
 		if (!channel?.isTextBased())
