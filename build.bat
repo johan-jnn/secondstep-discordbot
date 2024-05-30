@@ -1,5 +1,6 @@
 @echo off
-powershell cp .\launch.bat, .\.env, .\package.json, .\settings.yaml, .\webhooks.json .\.production\
+rm -r .production
 mkdir .production\dist
-powershell cp -r .\dist ".\.production\dist"
+powershell cp .\launch.bat, .\package.json .\.production\
+powershell cp -r .\dist .\.production
 echo Done !

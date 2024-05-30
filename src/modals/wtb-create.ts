@@ -35,20 +35,23 @@ export default class WTBCreate extends BotModal {
 					.setCustomId("etat")
 					.setLabel(`Etat de la paire (ramené sur ${defaultMaxNote})`)
 					.setStyle(TextInputStyle.Short)
+					.setRequired(true)
 					.setPlaceholder(
-						`Note à donner (ex. '8 / 10', '17 / 20', ...). Sur ${defaultMaxNote} par défaut.`
+						`'8 / 10', '17 / 20',... - Sur ${defaultMaxNote} par défaut.`
 					),
 				new TextInputBuilder()
 					.setCustomId("payout")
 					.setLabel("Payout")
+					.setRequired(false)
 					.setPlaceholder("ex. '15', '25,6€', '95€', '230.85€', ...")
 					.setStyle(TextInputStyle.Short),
 				new TextInputBuilder()
 					.setCustomId("sizes")
 					.setLabel("Tailles souhaités")
 					.setPlaceholder(
-						"Si plusieurs tailles souhaités, séparer les différentes tailles par des virgules."
+						"Séparer les différentes tailles souhaité par des virgules."
 					)
+					.setRequired(false)
 					.setStyle(TextInputStyle.Short),
 				new TextInputBuilder()
 					.setCustomId("description")
@@ -63,12 +66,14 @@ export default class WTBCreate extends BotModal {
 	}
 
 	private parseSizes(input: string) {
+		if (!input) return ["Full sizes"];
 		return input
 			.split(/\s*,\s*/)
 			.map((size) => `* ${size}`)
 			.join("\n");
 	}
 	private parsePayout(input: string) {
+		if (!input) return "?";
 		const number = parseFloat(
 			input.replaceAll(/\s*/g, "").replace(",", ".")
 		);
@@ -86,7 +91,9 @@ export default class WTBCreate extends BotModal {
 		];
 		if (isNaN(note) || isNaN(max) || note > max) return null;
 
-		return `${(note * defaultMaxNote / max).toFixed(1)} / ${defaultMaxNote}`;
+		return `${((note * defaultMaxNote) / max).toFixed(
+			1
+		)} / ${defaultMaxNote}`;
 	}
 
 	async onSubmited(
