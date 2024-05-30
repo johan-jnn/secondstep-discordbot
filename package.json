@@ -1,25 +1,25 @@
 {
-  "name": "wtb-discord-bot",
-  "module": "src/main.ts",
-  "main": "dist/main.js",
-  "type": "module",
-  "version": "1.0.2",
-  "author": "Johan",
-  "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5.4.5"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "scripts": {
-    "build": "tsc"
-  },
-  "dependencies": {
-    "discord.js": "^14.15.2",
-    "dotenv": "^16.4.5",
-    "fast-average-color-node": "^3.0.0",
-    "stockx-scraper": "^2.2.3",
-    "yaml": "^2.4.2"
-  }
+	"name": "wtb-discord-bot",
+	"module": "src/main.ts",
+	"main": "dist/main.js",
+	"type": "module",
+	"version": "1.0.3",
+	"author": "Johan",
+	"devDependencies": {
+		"@types/bun": "latest",
+		"typescript": "^5.4.5"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"scripts": {
+		"build": "tsc"
+	},
+	"dependencies": {
+		"discord.js": "^14.15.2",
+		"dotenv": "^16.4.5",
+		"fast-average-color-node": "^3.0.0",
+		"stockx-scraper": "^2.2.3",
+		"yaml": "^2.4.2"
+	}
 }

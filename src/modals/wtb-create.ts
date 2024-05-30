@@ -73,11 +73,10 @@ export default class WTBCreate extends BotModal {
 			.join("\n");
 	}
 	private parsePayout(input: string) {
-		if (!input) return "?";
 		const number = parseFloat(
 			input.replaceAll(/\s*/g, "").replace(",", ".")
 		);
-		if (isNaN(number)) return null;
+		if (isNaN(number)) return "?";
 		return number.toLocaleString("fr-FR", {
 			currency: "EUR",
 			style: "currency",
@@ -113,10 +112,13 @@ export default class WTBCreate extends BotModal {
 		};
 
 		for (const [key, value] of Object.entries(fields)) {
-			if (value === null)
-				return interaction.reply(
+			if (value === null) {
+				console.error("Arguments invalides:", fields);
+
+				return interaction.user.send(
 					getErrorMessage(`Entrée invalide pour le champ "${key}".`)
 				);
+			}
 		}
 
 		const data = await getProduct(sku);
