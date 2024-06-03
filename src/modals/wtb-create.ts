@@ -34,9 +34,9 @@ export default class WTBCreate extends BotModal {
 					.setStyle(TextInputStyle.Short),
 				new TextInputBuilder()
 					.setCustomId("etat")
-					.setLabel(`Etat de la paire (ramené sur ${defaultMaxNote})`)
+					.setLabel(`Etat minimum (ramené sur ${defaultMaxNote})`)
 					.setStyle(TextInputStyle.Short)
-					.setRequired(true)
+					.setRequired(false)
 					.setPlaceholder(
 						`'8 / 10', '17 / 20',... - Sur ${defaultMaxNote} par défaut.`
 					),
@@ -107,7 +107,7 @@ export default class WTBCreate extends BotModal {
 		const customDescription = getField("description");
 		const fields = {
 			SKU: sku,
-			"Etat recherché": this.parseEtat(getField("etat")),
+			"Etat Minimum": this.parseEtat(getField("etat")),
 			Payout: this.parsePayout(getField("payout")),
 			Tailles: this.parseSizes(getField("sizes")),
 		};

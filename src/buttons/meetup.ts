@@ -30,6 +30,7 @@ export default class Meetup extends BotButton {
 
 	async onClick(interaction: ButtonInteraction): Promise<any> {
 		if (!interaction.guild) return;
+
 		if (interaction.channel?.type !== ChannelType.GuildText) return;
 		const member = await getMember(interaction);
 		if (!member) return;
@@ -61,9 +62,8 @@ export default class Meetup extends BotButton {
 					await thread.members.add(userID);
 				for await (const roleID of this.client.settings.moderators
 					.roles) {
-					const members = interaction.guild?.roles.cache.get(
-						roleID
-					)?.members;
+					const members =
+						interaction.guild?.roles.cache.get(roleID)?.members;
 
 					if (!members) continue;
 					await Promise.all(
