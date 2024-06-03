@@ -7,7 +7,6 @@ export default class Ready extends BotEvent {
 	}
 
   async onTriggered(...parameters: any[]): Promise<any> {
-    console.log("Bot is ready to use !");
-    
+    console.log(`${this.client.user?.tag} is now ready to use.`);
   }
 }

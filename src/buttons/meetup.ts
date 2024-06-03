@@ -56,20 +56,28 @@ export default class Meetup extends BotButton {
 				await thread.setInvitable(false);
 
 				await thread.members.add(member);
-				for (const userID of this.client.settings.moderators.users)
-					thread.members.add(userID);
-				for (const roleID of this.client.settings.moderators.roles) {
-					const members =
-						interaction.guild?.roles.cache.get(roleID)?.members;
+				for await (const userID of this.client.settings.moderators
+					.users)
+					await thread.members.add(userID);
+				for await (const roleID of this.client.settings.moderators
+					.roles) {
+					const members = interaction.guild?.roles.cache.get(
+						roleID
+					)?.members;
+
 					if (!members) continue;
-					members.forEach((id) => thread.members.add(id));
+					await Promise.all(
+						members
+							.mapValues(({ id }) => thread.members.add(id))
+							.values()
+					);
 				}
 
 				const elementEmbed = new EmbedBuilder(
 					interaction.message.embeds[0].toJSON()
 				).setFooter({
 					text: `Ticket ouvert par ${interaction.user.tag}`,
-					iconURL: interaction.user.avatarURL() || undefined
+					iconURL: interaction.user.avatarURL() || undefined,
 				});
 
 				await thread

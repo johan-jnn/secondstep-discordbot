@@ -2,8 +2,6 @@ import {
 	ButtonBuilder,
 	ButtonInteraction,
 	ButtonStyle,
-	ChannelType,
-	ThreadAutoArchiveDuration,
 } from "discord.js";
 import WTBClient from "../main.js";
 import BotButton from "../utils/button.js";

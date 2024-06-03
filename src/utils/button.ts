@@ -2,7 +2,6 @@ import {
 	APIButtonComponent,
 	ButtonBuilder,
 	ButtonInteraction,
-  ButtonStyle,
 } from "discord.js";
 import WTBClient from "../main.js";
 import path from "node:path";

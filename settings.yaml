@@ -1,11 +1,11 @@
 moderators:
-  users:
-    - "514475217779818496"
-  roles: []
+    users: []
+    roles:
+        - "922098447081951242"
 
 guild:
-  id: "825437050320584744"
-  channels:
-    wtb: "1243156652199252048"
-  categories:
-    closed_tickets: "1244994345053061130"
+    id: "825437050320584744"
+    channels:
+        wtb: "1243156652199252048"
+    categories:
+        closed_tickets: "1244994345053061130"

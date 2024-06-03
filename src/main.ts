@@ -24,16 +24,14 @@ export default class WTBClient extends Client {
 	buttons?: BotButton[];
 	settings: Settings = yaml.parse(
 		readFileSync(
-			pathToFileURL(
-				path.join(import.meta.dirname, "../settings.yaml")
-			),
+			pathToFileURL(path.join(process.cwd(), "./settings.yaml")),
 			{ encoding: "utf-8" }
 		)
 	);
 	private isLogin = false;
 	constructor() {
 		super({
-			intents: ["Guilds", "GuildMembers"],
+			intents: ["Guilds", "GuildMembers", "GuildPresences"],
 		});
 	}
 

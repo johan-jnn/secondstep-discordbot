@@ -2,6 +2,7 @@ import {
 	ActionRowBuilder,
 	bold,
 	ButtonBuilder,
+	ChannelType,
 	codeBlock,
 	ColorResolvable,
 	EmbedBuilder,
@@ -157,10 +158,26 @@ export default class WTBCreate extends BotModal {
 			this.client.settings.guild.channels.wtb
 		);
 
-		if (!channel?.isTextBased())
+		if (channel?.type !== ChannelType.GuildText)
 			return interaction.user.send({
 				content: getErrorMessage(
-					"Je n'ai pas trouvé le salon où envoyer les offres."
+					"Je n'ai pas trouvé le salon où envoyer les offres. (Il se peut également que le salon spécifié ne soit pas un salon textuel)"
+				),
+			});
+
+		if (
+			channel
+				.permissionsFor("@me")
+				?.has([
+					"SendMessages",
+					"SendMessagesInThreads",
+					"CreatePrivateThreads",
+					"ManageThreads",
+				])
+		)
+			return interaction.user.send({
+				content: getErrorMessage(
+					"Je n'ai pas assez de permissions pour créer des WTB. Pour plus de simplicité, accordez-moi les permissions 'administrateur'."
 				),
 			});
 

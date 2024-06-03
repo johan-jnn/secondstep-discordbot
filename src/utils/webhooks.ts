@@ -1,6 +1,6 @@
 import { readFileSync, existsSync, writeFile } from "node:fs";
 import { join } from "node:path";
-const webhooksFile = join(import.meta.dirname, "../../webhooks.json");
+const webhooksFile = join(process.cwd(), "./webhooks.json");
 
 var cache: string[] | null = null;
 
@@ -25,6 +25,6 @@ export function saveWebhooks<T extends string[]>(data: T): T {
 export function updateWebhooks<T>(mutator: (list: string[]) => T): T {
 	const data = getWebhooks();
 	const res = mutator(data);
-	saveWebhooks(data)
+	saveWebhooks(data);
 	return res;
 }
