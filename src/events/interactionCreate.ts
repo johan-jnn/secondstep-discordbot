@@ -32,7 +32,7 @@ export default class InteractionCreate extends BotEvent {
 				interaction.customId
 			);
 			if (modal) return modal.onSubmited(interaction).catch(err => {
-				this.error(`${modal.informations.title} modal error`, err)
+				this.error(`${modal.informations.custom_id} modal error`, err)
 			});
 		} else if (interaction.isButton()) {
 			const button = this.client.getComponent(
