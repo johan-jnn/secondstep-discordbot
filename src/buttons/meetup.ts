@@ -75,10 +75,12 @@ export default class Meetup extends BotButton {
 
 				const elementEmbed = new EmbedBuilder(
 					interaction.message.embeds[0].toJSON()
-				).setFooter({
-					text: `Ticket ouvert par ${interaction.user.tag}`,
-					iconURL: interaction.user.avatarURL() || undefined,
-				});
+				)
+					.setFooter({
+						text: `Ticket ouvert par ${interaction.user.tag}`,
+						iconURL: interaction.user.avatarURL() || undefined,
+					})
+					.setTimestamp();
 
 				await thread
 					.send({

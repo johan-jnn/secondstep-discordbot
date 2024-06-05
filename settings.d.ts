@@ -6,9 +6,6 @@ export default interface Settings {
 	};
 	guild: {
 		id: string;
-		channels: {
-			wtb: string;
-		};
 		categories: {
 			closed_tickets: string;
 		};

@@ -11,9 +11,10 @@ import {
 import type WTBClient from "../main.js";
 import path from "node:path";
 
-export default class BotModal {
+export default class BotModal<CacheType = any> {
 	readonly informations: APIModalInteractionResponseCallbackData;
 	readonly client: WTBClient;
+	protected cache: CacheType | null = null;
 	constructor(
 		__filename: string,
 		client: WTBClient,
@@ -41,17 +42,19 @@ export default class BotModal {
 		interaction:
 			| ChatInputCommandInteraction
 			| ButtonInteraction
-			| AnySelectMenuInteraction
+			| AnySelectMenuInteraction,
+		cacheParameters?: CacheType
 	) {
 		if (interaction.replied || interaction.deferred)
 			throw new Error(
 				`Cannot show "${this.informations.custom_id}" modal because the given interaction has been replied/deffered.`
 			);
+		this.cache = cacheParameters || null;
 		return interaction.showModal(this.informations);
 	}
 }
 
-export class BotModalElement extends BotModal {
+export class BotModalElement extends BotModal<any> {
 	//@ts-ignore
 	constructor(client: WTBClient);
 }

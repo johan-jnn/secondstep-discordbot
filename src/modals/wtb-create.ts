@@ -6,7 +6,7 @@ import {
 	codeBlock,
 	ColorResolvable,
 	EmbedBuilder,
-	GuildMember,
+	GuildTextBasedChannel,
 	hyperlink,
 	ModalSubmitInteraction,
 	TextInputBuilder,
@@ -22,7 +22,9 @@ import { getAverageColor } from "fast-average-color-node";
 import { getWebhooks } from "../utils/webhooks.js";
 
 const defaultMaxNote = 10;
-export default class WTBCreate extends BotModal {
+export default class WTBCreate extends BotModal<{
+	send_on_channel: GuildTextBasedChannel;
+}> {
 	constructor(client: WTBClient) {
 		super(import.meta.filename, client, {
 			title: "Créer un nouveau WTB",
@@ -84,6 +86,8 @@ export default class WTBCreate extends BotModal {
 		});
 	}
 	private parseEtat(input: string) {
+		if (!input) return "Tout état";
+
 		const [note_str, max_str] = input.split(/\s*\/\s*/);
 		const [note, max] = [
 			parseFloat(note_str || "0"),
@@ -154,9 +158,7 @@ export default class WTBCreate extends BotModal {
 
 		if (customDescription) embed.setDescription(customDescription);
 
-		const channel = this.client.channels.cache.get(
-			this.client.settings.guild.channels.wtb
-		);
+		const channel = this.cache?.send_on_channel;
 
 		if (channel?.type !== ChannelType.GuildText)
 			return interaction.user.send({

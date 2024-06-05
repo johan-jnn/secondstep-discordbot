@@ -67,7 +67,7 @@ export default class WTBClient extends Client {
 			? BotModal
 			: Collection extends "buttons"
 			? BotButton
-			: never
+			: never,
 	>(collection: Collection, handle: string): R | null {
 		const collectionContent = this[collection];
 		return (collectionContent?.find(
