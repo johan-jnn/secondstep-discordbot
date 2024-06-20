@@ -9,7 +9,9 @@ import "dotenv/config";
 import BotModal from "./utils/modal.js";
 import type { BotModalElement } from "./utils/modal.js";
 import yaml from "yaml";
-import Settings from "../settings.js";
+import type Settings from "../settings.js";
+import pkg from "../package.json";
+
 import BotButton, { BotButtonElement } from "./utils/button.js";
 
 function listDir(dir: string) {
@@ -29,6 +31,7 @@ export default class WTBClient extends Client {
 		)
 	);
 	private isLogin = false;
+	readonly package = pkg;
 	constructor() {
 		super({
 			intents: ["Guilds", "GuildMembers", "GuildPresences"],
@@ -67,7 +70,7 @@ export default class WTBClient extends Client {
 			? BotModal
 			: Collection extends "buttons"
 			? BotButton
-			: never,
+			: never
 	>(collection: Collection, handle: string): R | null {
 		const collectionContent = this[collection];
 		return (collectionContent?.find(

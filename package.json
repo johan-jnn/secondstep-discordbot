@@ -3,8 +3,15 @@
 	"module": "src/main.ts",
 	"main": "dist/main.js",
 	"type": "module",
-	"version": "1.1.1",
-	"author": "Johan",
+	"version": "1.1.2",
+	"author": {
+		"name": "Johan JANIN",
+		"url": "https://johan-janin.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/johan-jnn/secondstep-discordbot.git"
+	},
 	"devDependencies": {
 		"@types/bun": "latest",
 		"typescript": "^5.4.5"
