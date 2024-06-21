@@ -76,7 +76,7 @@ export default class Ping extends BotCommand {
 							),
 						},
 						{
-							name: "Statistiques générals",
+							name: "Statistiques générales",
 							value: italic(
 								[
 									`${
