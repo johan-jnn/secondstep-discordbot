@@ -10,7 +10,12 @@ import BotModal from "./utils/modal.js";
 import type { BotModalElement } from "./utils/modal.js";
 import yaml from "yaml";
 import type Settings from "../settings.js";
-import pkg from "../package.json";
+import type jsonPackage from "../package.json";
+const pkg: typeof jsonPackage = JSON.parse(
+	readFileSync(path.join(process.cwd(), "./package.json"), {
+		encoding: "utf-8",
+	})
+);
 
 import BotButton, { BotButtonElement } from "./utils/button.js";
 
@@ -134,6 +139,6 @@ export default class WTBClient extends Client {
 }
 
 const client = new WTBClient();
-console.log(client.settings);
+console.log("Package:\n", client.package, "\nSettings:\n", client.settings);
 
 client.login();
